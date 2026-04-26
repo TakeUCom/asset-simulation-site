@@ -29,3 +29,20 @@ npm run dev
 ```
 
 起動後は、Vite が表示するローカルURLをブラウザで開いて確認します。
+
+## GitHub Pages
+
+GitHub Pages 用の workflow は [deploy-pages.yml](C:\git\asset-simulation-site\.github\workflows\deploy-pages.yml) を追加済みです。
+
+公開するには、GitHub 側で以下を設定してください。
+
+1. リポジトリの `Settings` を開く
+2. `Pages` を開く
+3. `Build and deployment` の `Source` で `GitHub Actions` を選ぶ
+4. `main` ブランチへ push する
+
+補足:
+
+- このリポジトリは `ui/` 配下を build して `ui/dist` を Pages へ配備します
+- リポジトリ Pages では `/asset-simulation-site/` 配下で動くよう、Vite の `base` を自動調整します
+- 独自ドメインやユーザー Pages に切り替える場合は、必要に応じて `VITE_BASE_PATH` で公開パスを上書きできます
