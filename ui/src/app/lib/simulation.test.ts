@@ -89,25 +89,26 @@ describe("calculateYearlyRows", () => {
   });
 
   it("余剰がある年は、余剰 = 手取り収入 - 支出 になり、投資と貯蓄へ正しく配分される", () => {
-    // 年収600万円、手取り率80%なら手取りは480万円。
-    // 月25万円の支出なので年300万円、年間余剰は180万円になる。
-    // 固定投資5万円/月 = 年60万円なので、残り120万円が現金貯蓄へ回る想定。
+    // 年収600万円を簡易手取り計算すると、手取りは4,505,500円。
+    // 月25万円の支出なので年300万円、年間余剰は1,505,500円になる。
+    // 固定投資5万円/月 = 年60万円なので、残り905,500円が現金貯蓄へ回る想定。
     const rows = calculateYearlyRows(createBaseInputs());
     const firstYear = rows[0];
 
-    expect(firstYear.takeHomeIncome).toBe(4_800_000);
-    expect(firstYear.totalIncome).toBe(4_800_000);
+    expect(firstYear.takeHomeIncome).toBe(4_505_500);
+    expect(firstYear.totalIncome).toBe(4_505_500);
     expect(firstYear.totalExpense).toBe(3_000_000);
-    expect(firstYear.surplusBeforeInvestment).toBe(1_800_000);
+    expect(firstYear.surplusBeforeInvestment).toBe(1_505_500);
     expect(firstYear.investmentAmount).toBe(600_000);
-    expect(firstYear.savingsAmount).toBe(1_200_000);
+    expect(firstYear.savingsAmount).toBe(905_500);
     expect(firstYear.withdrawalAmount).toBe(0);
-    expect(firstYear.totalAsset).toBe(1_800_000);
-    expect(firstYear.totalAssetWithoutInvestment).toBe(1_800_000);
+    expect(firstYear.totalAsset).toBe(1_505_500);
+    expect(firstYear.totalAssetWithoutInvestment).toBe(1_505_500);
   });
 
   it("赤字年は投資を停止し、足りない分だけ現金残高の取り崩しとして扱う", () => {
-    // 手取り240万円に対して年300万円支出だと年間60万円の赤字。
+    // 年収300万円を簡易手取り計算すると、手取りは2,322,250円。
+    // 年300万円支出だと年間677,750円の赤字になる。
     // 固定投資設定があっても、赤字年に追加投資しないことを確認する。
     const inputs = createBaseInputs();
     inputs.household.userIncome = "3000000";
@@ -115,28 +116,28 @@ describe("calculateYearlyRows", () => {
     const rows = calculateYearlyRows(inputs);
     const firstYear = rows[0];
 
-    expect(firstYear.takeHomeIncome).toBe(2_400_000);
-    expect(firstYear.surplusBeforeInvestment).toBe(-600_000);
+    expect(firstYear.takeHomeIncome).toBe(2_322_250);
+    expect(firstYear.surplusBeforeInvestment).toBe(-677_750);
     expect(firstYear.investmentAmount).toBe(0);
     expect(firstYear.savingsAmount).toBe(0);
-    expect(firstYear.withdrawalAmount).toBe(600_000);
-    expect(firstYear.cashBalance).toBe(-600_000);
-    expect(firstYear.totalAssetWithoutInvestment).toBe(-600_000);
+    expect(firstYear.withdrawalAmount).toBe(677_750);
+    expect(firstYear.cashBalance).toBe(-677_750);
+    expect(firstYear.totalAssetWithoutInvestment).toBe(-677_750);
     expect(firstYear.isDeficit).toBe(true);
   });
 
   it("割合投資モードでは、その年の余剰に対する指定割合だけを投資へ回す", () => {
-    // 年間余剰180万円の50%を投資するので、投資90万円・現金貯蓄90万円になる想定。
+    // 年間余剰1,505,500円の50%を投資するので、投資752,750円・現金貯蓄752,750円になる想定。
     const inputs = createBaseInputs();
     inputs.investment.investmentMode = "percentage";
     inputs.investment.percentage = "50";
 
     const firstYear = calculateYearlyRows(inputs)[0];
 
-    expect(firstYear.surplusBeforeInvestment).toBe(1_800_000);
-    expect(firstYear.investmentAmount).toBe(900_000);
-    expect(firstYear.savingsAmount).toBe(900_000);
-    expect(firstYear.targetInvestmentAmount).toBe(900_000);
+    expect(firstYear.surplusBeforeInvestment).toBe(1_505_500);
+    expect(firstYear.investmentAmount).toBe(752_750);
+    expect(firstYear.savingsAmount).toBe(752_750);
+    expect(firstYear.targetInvestmentAmount).toBe(752_750);
   });
 
   it("単年収入と複数年収入は有効年だけ加算され、年次調整の増減も同じ収入欄へ反映される", () => {
@@ -184,7 +185,7 @@ describe("calculateYearlyRows", () => {
     const rows = calculateYearlyRows(inputs);
 
     expect(rows[0].annualIncome).toBe(330_000);
-    expect(rows[0].totalIncome).toBe(5_130_000);
+    expect(rows[0].totalIncome).toBe(4_835_500);
     expect(rows[1].annualIncome).toBe(100_000);
     expect(rows[2].annualIncome).toBe(0);
   });
@@ -382,15 +383,15 @@ describe("calculateSimulation", () => {
   });
 
   it("赤字はないが余剰が薄いケースは attention 判定になる", () => {
-    // 手取り312万円、支出300万円なら年間余剰は12万円。
-    // 赤字ではないが、初年度支出300万円の10%未満なので attention になる想定。
+    // 年収390万円の簡易手取りは3,004,100円。
+    // 支出300万円だと年間余剰は4,100円で、黒字だが十分な余裕がないため attention になる想定。
     const inputs = createBaseInputs();
     inputs.household.userIncome = "3900000";
 
     const result = calculateSimulation(inputs);
 
     expect(result.kpi.deficitYears).toBe(0);
-    expect(result.kpi.minimumAnnualSurplus).toBe(120_000);
+    expect(result.kpi.minimumAnnualSurplus).toBe(4_100);
     expect(result.kpi.status).toBe("attention");
   });
 

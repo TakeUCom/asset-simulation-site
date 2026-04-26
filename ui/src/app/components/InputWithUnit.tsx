@@ -1,6 +1,7 @@
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { ValidationMessage } from "./ValidationMessage";
+import { formatNumericInput, sanitizeNumericInput } from "../lib/numberFormatting";
 
 interface InputWithUnitProps {
   label: string;
@@ -30,6 +31,9 @@ export function InputWithUnit({
   error,
   required = false
 }: InputWithUnitProps) {
+  const isNumericInput = type === "number";
+  const displayValue = isNumericInput ? formatNumericInput(value) : value;
+
   return (
     <div className="space-y-2">
       <Label>
@@ -38,10 +42,11 @@ export function InputWithUnit({
       </Label>
       <div className="relative">
         <Input
-          type={type}
+          type={isNumericInput ? "text" : type}
+          inputMode={isNumericInput ? "numeric" : undefined}
           placeholder={placeholder}
-          value={value}
-          onChange={(e) => onChange?.(e.target.value)}
+          value={displayValue}
+          onChange={(e) => onChange?.(isNumericInput ? sanitizeNumericInput(e.target.value) : e.target.value)}
           className={`${unit ? "pr-16" : ""} ${error ? "border-destructive" : ""}`}
         />
         {unit && (

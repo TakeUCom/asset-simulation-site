@@ -127,8 +127,9 @@ export function IncomeInputWithTakeHome({
         </div>
         <div className="mt-4 pt-4 border-t">
           <p className="text-xs text-muted-foreground">
-            ⚠️ 手取り額は概算です。社会保険料、所得税、住民税の簡易計算による目安であり、
-            実際の金額とは異なる場合があります。正確な可処分所得は、給与明細などでご確認ください。
+            ⚠️ 手取り額は概算です。独身・扶養なし・給与所得のみの簡易モデルとして、
+            給与所得控除、社会保険料、所得税、住民税を使って計算しています。
+            控除や自治体差分は反映していないため、実際の金額とは異なる場合があります。
           </p>
         </div>
       </Card>
