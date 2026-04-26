@@ -103,17 +103,5 @@ export const SIMULATION_SETTINGS = {
   compareMaxScenarios: 3,
   // 旧実装で投資画面のダミー表示に使っていた月次余剰額。
   // 現在は家計入力から算出した実値を使っているため、段階的に廃止予定。
-  currentMonthlySurplus: 120000,
-  // 額面年収から手取りを概算するためのレート。
-  // 上から順に最初に一致した条件を使うため、高い年収帯から低い年収帯の順で並べる。
-  takeHomeRateBands: [
-    // 1,500万円以上。税・社会保険料負担が重い層として低めの手取り率を置く。
-    { minIncome: 15000000, rate: 0.7 },
-    // 1,000万円以上。
-    { minIncome: 10000000, rate: 0.75 },
-    // 300万円以上。
-    { minIncome: 3000000, rate: 0.8 },
-    // 300万円未満。
-    { minIncome: 0, rate: 0.85 }
-  ]
+  currentMonthlySurplus: 120000
 } as const;
