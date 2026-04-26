@@ -3,6 +3,31 @@ import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
+/**
+ * GitHub Pages 向けの公開パスを解決する。
+ *
+ * - ローカル開発: `/`
+ * - リポジトリ Pages: `/{repo-name}/`
+ * - ユーザー/組織 Pages: `/`
+ * - 明示上書きしたい場合: `VITE_BASE_PATH`
+ */
+function resolveBasePath() {
+  const explicitBasePath = process.env.VITE_BASE_PATH
+  if (explicitBasePath) {
+    return explicitBasePath
+  }
+
+  if (process.env.GITHUB_PAGES !== 'true') {
+    return '/'
+  }
+
+  const repositoryName = process.env.GITHUB_REPOSITORY?.split('/')[1]
+  if (!repositoryName || repositoryName.endsWith('.github.io')) {
+    return '/'
+  }
+
+  return `/${repositoryName}/`
+}
 
 function figmaAssetResolver() {
   return {
@@ -17,6 +42,7 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
+  base: resolveBasePath(),
   plugins: [
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if
